@@ -1,1 +1,1 @@
-# Drug-Recommendator-System-based-on-NLP
+# Treatment-Recommendator-System-based-on-NLP
