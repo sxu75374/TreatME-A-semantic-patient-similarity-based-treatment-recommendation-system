@@ -26,7 +26,7 @@ import random
 
 """ load """
 plt.ion()
-df = pd.read_csv('/Users/xs/PycharmProjects/TREATRCOMM/data/patients_data.csv', )
+df = pd.read_csv('/Users/xs/PycharmProjects/TREATRCOMM/data/patients_data.csv')
 print(df.info(), df.head())
 
 """ preprocessing """
@@ -288,6 +288,12 @@ class WordSimilarity:
         return (self.length_dist(synset_pair[0], synset_pair[1]) *
                 self.hierarchy_dist(synset_pair[0], synset_pair[1]))
 
+    # def word_similarity(self, word_1, word_2):
+    #     synset_pair = self.get_best_synset_pair(word_1, word_2)
+    #     if not synset_pair[0] or not synset_pair[1]:
+    #         return 0
+    #     return synset_pair[0].wup_similarity(synset_pair[1])
+
 
 class TextualSimilarity(WordSimilarity):
 
@@ -326,9 +332,9 @@ class SentenceSimilarity(WordSimilarity):
         sim_word = ""
         for ref_word in word_set:
             sim = self.word_similarity(word, ref_word)
-        if sim > max_sim:
-            max_sim = sim
-            sim_word = ref_word
+            if sim > max_sim:
+                max_sim = sim
+                sim_word = ref_word
         return sim_word, max_sim
 
     def info_content(self, lookup_word):
@@ -381,13 +387,15 @@ class SentenceSimilarity(WordSimilarity):
         wordset = set(words)
         for joint_word in joint_words:
             if joint_word in wordset:
-                wovec[i] = windex[joint_word]
+                for w_i, word in enumerate(words):
+                    if word == joint_word:
+                        wovec[i] = w_i + 1
             else:
                 sim_word, max_sim = self.most_similar_word(joint_word, wordset)
                 if max_sim > ETA:
-                    wovec[i] = windex[sim_word]
+                    wovec[windex[joint_word]] = windex[sim_word] + 1
                 else:
-                    wovec[i] = 0
+                    wovec[windex[joint_word]] = 0
             i = i + 1
         return wovec
 
@@ -417,11 +425,12 @@ class SentenceSimilarity(WordSimilarity):
 
 class RecommendationSystem:
 
-    def __init__(self, data, top_k):
+    def __init__(self, data, top_k, top_n):
         self.txtsim = TextualSimilarity()
         self.sentsim = SentenceSimilarity()
         self.data = data
         self.top_k_users = top_k
+        self.top_n_recommendations = top_n
 
     def find_similar_symptoms(self, user_symptom):
         similar_list = []
@@ -450,7 +459,7 @@ class RecommendationSystem:
                         similar_list.append(item)
                     break
 
-        # use conceptnet to find similar symptoms
+        # use conceptnet to find similar symptoms (query)
         for symp in user_symptom:
             symptom = symp.lower().replace(' ', '_')
             obj = requests.get('http://api.conceptnet.io/query?node=/c/en/' + symptom + '&start=/c/en&end=/c/en&rel=/r/Synonym').json()
@@ -464,7 +473,7 @@ class RecommendationSystem:
 
     def find_similar_patients(self, user_symptom, user_disease, age, gender):
 
-        # # use ConceptNet to find user_symptom and user_disease synonyms
+        # use ConceptNet to find user_symptom and user_disease synonyms
         fuzzy_user_disease = []
         user_disease_slash = re.sub(r"\(.*?\)|\{.*?}|\[.*?]", "", user_disease.lower()).strip().replace(' ', '_')
         p1 = re.compile(r'[(](.*?)[)]', re.S)
@@ -476,8 +485,8 @@ class RecommendationSystem:
             for link2 in obj2['edges']:
                 word3 = link2['end']['label']
                 word4 = link2['start']['label']
-                fuzzy_user_disease.append(word3)
-                fuzzy_user_disease.append(word4)
+                fuzzy_user_disease.append(word3.lower())
+                fuzzy_user_disease.append(word4.lower())
         # print(user_disease_slash)
         # print(user_disease_parenthesis)
 
@@ -486,11 +495,12 @@ class RecommendationSystem:
         for link in obj['edges']:
             word1 = link['end']['label']
             word2 = link['start']['label']
-            fuzzy_user_disease.append(word1)
-            fuzzy_user_disease.append(word2)
+            fuzzy_user_disease.append(word1.lower())
+            fuzzy_user_disease.append(word2.lower())
 
+        fuzzy_user_disease.append(user_disease)
         fuzzy_user_disease = list(set(fuzzy_user_disease))
-        fuzzy_user_disease.append(user_disease.lower())
+        print(fuzzy_user_disease)
 
         # 找相似的symptom，和input的symptom合并
         similar_symptom = self.find_similar_symptoms(user_symptom)
@@ -522,9 +532,13 @@ class RecommendationSystem:
                     symptoms_to_check[i] = symptom.lower()
                 common_symptom = [symptom for symptom in symptom_list if symptom.lower() in symptoms_to_check]
                 similarity_val = float(len(common_symptom) / (len(symptoms_to_check) + user_symp_len))
+                if (similarity_val, patient_gender, patient_age, patient_treatments) in similarity:
+                    continue
+
                 similarity.append((similarity_val, patient_gender, patient_age, patient_treatments))
 
         similarity.sort(reverse=True)
+        print('similarity', similarity)
 
         # matching patients
         users_matched = 0
@@ -534,7 +548,7 @@ class RecommendationSystem:
                 break
 
             # filter: gender, difference of age > 5, similarity = 0
-            if p_gender.lower() != gender.lower() or abs(int(p_age) - int(age)) > 50 or value == 0:
+            if p_gender.lower() != gender.lower() or abs(int(p_age) - int(age)) > 20 or value == 0:
                 continue
 
             # find treatments from similar patients
@@ -549,8 +563,10 @@ class RecommendationSystem:
             treatments[treatment] = treatments.get(treatment, 0) + 1
         treatments = dict(sorted(treatments.items(), key=lambda x: x[1], reverse=True))
         # print('similar conditions', fuzzy_user_disease, '\nsimilar symptoms', symptom_list)
-
-        return treatments
+        print('treatment dict:', treatments)
+        top_n_treatments = list(treatments)[:self.top_n_recommendations]
+        print('final top N treatment', top_n_treatments)
+        return top_n_treatments
 
     def collaborative_filter(self, symptom, disease, age, gender):
 
@@ -568,6 +584,7 @@ class ReferenceSystem:
         self.top_k = k
 
     def trivial_system(self, run_time=10):
+        pass
         # random recommendation
         treatment_index = random.randint(0, len(treatment_length_dict) - 1)
         treatment_number = random.randint(0, 10)
@@ -583,7 +600,7 @@ class ReferenceSystem:
         # baseline 1. POP (popular products): this model recommends the most popular products in the training set.
         #            (658 * length choose randint?)
         # baseline 2. random recommendation within condition-treatments mapping (658 * length choose randint?)
-        # baseline 3. recommend top k frequent treatments within condition-treatments mapping (658 * k)
+        # baseline 3. recommend top k frequent treatments within condition-treatments mapping (658 * k) 教授：根据这个symptom的最常用的treatment来推荐，topk就推荐k个最常见的
 
         # Q: length of the prediction? 5? random int?
 
@@ -593,6 +610,8 @@ def evaluation(model, reference):
     # Micro precision (joint1 + joint2 + ... / yhat1 + yhat2 + ...), recall, f1
 
     count = 0
+    record = dict()
+    xgrid_min, xgrid_max = 0, -sys.maxsize
     y_len, y_hat_len, total_intercept = 0, 0, 0
     for i in range(len(data_test)):
         count += 1
@@ -605,7 +624,8 @@ def evaluation(model, reference):
             y_pred = model.baseline_system(symptom, condition, age, gender)
         else:
             y_pred = model.collaborative_filter(symptom, condition, age, gender)
-
+        xgrid_min, xgrid_max = 0, max(xgrid_max, len(y_pred))
+        record[len(y_pred)] = record.get(len(y_pred), 0) + 1
         print('recommendation:', y_pred)
         y_true = y_test[i].split(',')
         print('y_true', y_true)
@@ -617,11 +637,18 @@ def evaluation(model, reference):
     precision_k = total_intercept / y_hat_len
     recall_k = total_intercept / y_len
     f1_k = (2 * precision_k * recall_k) / (precision_k + recall_k)
-    print('top{}, precision = {}, recall = {}, f1 = {}'.format(k, precision_k, recall_k, f1_k))
+    print('top{} similar patients, with top{} treatments precision = {}, recall = {}, f1 = {}'.format(k, n, precision_k, recall_k, f1_k))
+    plt.figure()
+    plt.title('Distribution of the length of prediction')
+    plt.bar(*zip(*record.items()))
+    plt.xlabel('Length of the prediction')
+    plt.ylabel('Number of Datapoints')
 
 
 if __name__ == '__main__':
-    k = 6
+    """ no sentence semantic similarity; fuzzy search; w+h distance measure; visited set """
+    k = 3
+    n = 3
 
     # trivial system
     # rfs_trivial = ReferenceSystem(data=data_train, top_k=k)
@@ -634,10 +661,8 @@ if __name__ == '__main__':
     # evaluation(rfs_baseline, 'baseline')
 
     # CF
-    trs = RecommendationSystem(data=data_train, top_k=k)
+    trs = RecommendationSystem(data=data_train, top_k=k, top_n=n)
     evaluation(trs, 'rs')
-
-
 
 
 
@@ -651,4 +676,4 @@ if __name__ == '__main__':
 
 
 plt.ioff()
-# plt.show()
+plt.show()
