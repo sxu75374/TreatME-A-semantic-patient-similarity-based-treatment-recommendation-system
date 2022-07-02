@@ -42,7 +42,7 @@ There are four main parts in `WholeProject.py`.
 
 
 ### Installation
-This project built and tested with Python 3.7.4, included package nltk 3.7, scikit-learn 1.0.1, pandas 1.3.4, numpy 1.21.4, request 2.27.1 and matplotlib 3.4.3.
+This project was built and tested with Python 3.7.4, included package nltk 3.7, scikit-learn 1.0.1, pandas 1.3.4, numpy 1.21.4, request 2.27.1 and matplotlib 3.4.3.
 
 
 ## further improvement
