@@ -34,9 +34,6 @@ There are four main parts in `WholeProject.py`.
 <br />
 <div align="center">
   <img src="screenshots/screenshot1.png" alt="screenshot1" width="570" height="400">
-  <img src="screenshots/screenshot2.png" alt="screenshot2" width="500" height="500">
-  <img src="screenshots/screenshot3.png" alt="screenshot3" width="530" height="400">
-  <img src="screenshots/screenshot4.png" alt="screenshot4" width="570" height="400">
 </div>
 
 
@@ -53,14 +50,19 @@ This code built and tested with Python 3.7.4, included package nltk 3.7, scikit-
 xxx
 
 
-## Author
+## Contribution
 
-**Shuai Xu** | University of Southern California
+**Shuai Xu** | University of Southern California | [Profile](https://github.com/sxu75374) - <a href="mailto:imshuaixu@gmail.com?subject=Nice to meet you!&body=Hi Shuai!">Email</a>
 
-[Profile](https://github.com/sxu75374) - <a href="mailto:imshuaixu@gmail.com?subject=Nice to meet you!&body=Hi Shuai!">Email</a>
+Shuai Xu contributed to this project and paper individually.
 
-Project Link: [https://github.com/sxu75374/TreatME-A-semantic-patient-similarity-based-treatment-recommendation-system](https://github.com/sxu75374/TreatME-A-semantic-patient-similarity-based-treatment-recommendation-system)
+### Acknowledge
 
+This project was suppervised by Prof. Srivastava @USC and Prof. Raghavendra @USC. Thanks for their help and suggestions.
+
+### Reference
+
+https://conceptnet.io/
 
 <!-- LICENSE -->
 ## License
