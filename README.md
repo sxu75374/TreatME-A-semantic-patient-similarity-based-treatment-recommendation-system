@@ -48,7 +48,7 @@ There are four main parts in `WholeProject.py`.
 This code built and tested with Python 3.7.4, included package nltk 3.7, scikit-learn 1.0.1, pandas 1.3.4, numpy 1.21.4, request 2.27.1 and matplotlib 3.4.3.
 
 
-### further improvement
+## further improvement
 
 xxx
 
@@ -59,7 +59,8 @@ xxx
 
 [Profile](https://github.com/sxu75374) - <a href="mailto:imshuaixu@gmail.com?subject=Nice to meet you!&body=Hi Shuai!">Email</a>
 
-Project Link: [https://github.com/sxu75374/LifeExpectancyPrediction](https://github.com/sxu75374/LifeExpectancyPrediction)
+Project Link: [https://github.com/sxu75374/TreatME-A-semantic-patient-similarity-based-treatment-recommendation-system](https://github.com/sxu75374/TreatME-A-semantic-patient-similarity-based-treatment-recommendation-system)
+
 
 <!-- LICENSE -->
 ## License
