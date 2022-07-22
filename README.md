@@ -20,27 +20,7 @@
 </details>
 
 ## About The Project
-<!--介绍论文--> Nowadays, medication errors happen frequently, leading
-to severe consequences. 42% of the medication errors are
-caused by the lack of medical knowledge of new drugs or
-experience with some diseases. In recent years, medical
-recommendation has played an important role in the
-related fields. In this paper, we constructed a semantic
-patient-similarity-based collaborative filtering treatment
-recommendation system, called TreatME. We used
-lexical databases ConceptNet and NLTK WordNet to
-help measure word semantic similarity and sentence
-semantic similarity by treating the patient’s symptoms as
-a sentence including semantic and structural information.
-Then, we implemented the collaborative filtering
-approach on the recommendation system to recommend
-top-k treatments based on the top 3 similar patients. Our
-proposed model shows a higher precision@k, recall@k,
-and f1@k score compared with the trivial model,
-popularity-based baseline models, and Jaccardsimilarity-
-based model. The performance of TreatME is
-promising to serve as a treatment recommendation
-system application in daily use based on a large dataset.
+<!--介绍论文--> Nowadays, medication errors happen frequently, leading to severe consequences. 42% of the medication errors are caused by the lack of medical knowledge of new drugs or experience with some diseases. In recent years, medical recommendation has played an important role in the related fields. In this paper, we constructed a semantic patient-similarity-based collaborative filtering treatment recommendation system, called TreatME. We used lexical databases ConceptNet and NLTK WordNet to help measure word semantic similarity and sentence semantic similarity by treating the patient’s symptoms as a sentence including semantic and structural information. Then, we implemented the collaborative filtering approach on the recommendation system to recommend top-k treatments based on the top 3 similar patients. Our proposed model shows a higher precision@k, recall@k, and f1@k score compared with the trivial model, popularity-based baseline models, and Jaccardsimilarity-based model. The performance of TreatME is promising to serve as a treatment recommendation system application in daily use based on a large dataset.
 
 web scrapper
 <!--引用算法和论文-->. 
